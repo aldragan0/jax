@@ -1073,6 +1073,20 @@ class LaxBackedNumpyTests(jtu.JaxTestCase):
     self._CheckAgainstNumpy(np_fun, jnp_fun, args_maker)
     self._CompileAndCheck(jnp_fun, args_maker)
 
+  @parameterized.named_parameters(jtu.cases_from_list(
+      {"testcase_name": "_{}_{}".format(
+       jtu.format_shape_dtype_string(shape1, dtype),
+       jtu.format_shape_dtype_string(shape2, dtype)),
+       "shape1": shape1, "shape2": shape2, "dtype": dtype}
+      for dtype in default_dtypes
+      for shape1 in all_shapes
+      for shape2 in all_shapes))
+  def testSetdiff1d(self, shape1, shape2, dtype):
+    rng = jtu.rand_default(self.rng())
+    args_maker = lambda: [rng(shape1, dtype), rng(shape2, dtype)]
+    jnp_fun = lambda ar1, ar2: jnp.setdiff1d(ar1, ar2)
+    np_fun = lambda ar1, ar2: np.setdiff1d(ar1, ar2)
+    self._CheckAgainstNumpy(np_fun, jnp_fun, args_maker)
 
   @parameterized.named_parameters(jtu.cases_from_list(
       {"testcase_name": "_{}_{}_assume_unique={}_return_indices={}".format(
